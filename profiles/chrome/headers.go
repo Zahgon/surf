@@ -218,23 +218,8 @@ var headerCache = profiles.NewHeaderCache(headerOrderDesktop, headerOrderMobile)
 
 // buildHeadersDesktop constructs the desktop Chrome 145 request header set.
 func buildHeadersDesktop(os profiles.OSKey) *g.MapOrd[g.String, g.String] {
-	h := g.NewMapOrd[g.String, g.String]()
-	h.Insert(":authority", "")
-	h.Insert(":method", "")
-	h.Insert(":path", "")
-	h.Insert(":scheme", "")
-	h.Insert(header.ACCEPT_ENCODING, "gzip, deflate, br, zstd")
-	h.Insert(header.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
-	h.Insert(header.AUTHORIZATION, "")
-	h.Insert(header.COOKIE, "")
-	h.Insert(header.ORIGIN, "")
-	h.Insert(header.REFERER, "")
-	h.Insert(header.SEC_CH_UA, SecCHUA)
-	h.Insert(header.SEC_CH_UA_MOBILE, os.Mobile())
-	h.Insert(header.SEC_CH_UA_PLATFORM, Platform.Get(os).UnwrapOrDefault())
-	h.Insert(header.USER_AGENT, UserAgent.Get(os).UnwrapOrDefault())
-
-	return &h
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // buildHeadersMobile constructs the placeholder mobile Chrome 145 request header set.
@@ -242,23 +227,8 @@ func buildHeadersDesktop(os profiles.OSKey) *g.MapOrd[g.String, g.String] {
 // shorter sec-ch-ua, different ordering / inserts), replace this body — it is the single point
 // of substitution for the entire mobile header set.
 func buildHeadersMobile(os profiles.OSKey) *g.MapOrd[g.String, g.String] {
-	h := g.NewMapOrd[g.String, g.String]()
-	h.Insert(":authority", "")
-	h.Insert(":method", "")
-	h.Insert(":path", "")
-	h.Insert(":scheme", "")
-	h.Insert(header.ACCEPT_ENCODING, "gzip, deflate, br, zstd")
-	h.Insert(header.ACCEPT_LANGUAGE, "en-US,en;q=0.9")
-	h.Insert(header.AUTHORIZATION, "")
-	h.Insert(header.COOKIE, "")
-	h.Insert(header.ORIGIN, "")
-	h.Insert(header.REFERER, "")
-	h.Insert(header.SEC_CH_UA, SecCHUA)
-	h.Insert(header.SEC_CH_UA_MOBILE, os.Mobile())
-	h.Insert(header.SEC_CH_UA_PLATFORM, Platform.Get(os).UnwrapOrDefault())
-	h.Insert(header.USER_AGENT, UserAgent.Get(os).UnwrapOrDefault())
-
-	return &h
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // --- Per-request header pipeline (Variant.Headers) ---------------------------
@@ -270,55 +240,13 @@ var DesktopApplier = profiles.NewApplier(insertDesktopHeaders, insertDesktopHead
 var MobileApplier = profiles.NewApplier(insertMobileHeaders, insertMobileHeaders, headerCache, true)
 
 func insertDesktopHeaders[T ~string](headers *g.MapOrd[T, T], method string) {
-	switch method {
-	case http.MethodPost:
-		headers.Insert(header.ACCEPT, "*/*")
-		headers.Insert(header.CACHE_CONTROL, "no-cache")
-		headers.Insert(header.CONTENT_TYPE, "")
-		headers.Insert(header.CONTENT_LENGTH, "")
-		headers.Insert(header.PRAGMA, "no-cache")
-		headers.Insert(header.PRIORITY, "u=1, i")
-		headers.Insert(header.SEC_FETCH_DEST, "empty")
-		headers.Insert(header.SEC_FETCH_MODE, "cors")
-		headers.Insert(header.SEC_FETCH_SITE, "same-origin")
-	default:
-		headers.Insert(
-			header.ACCEPT,
-			"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-		)
-		headers.Insert(header.PRIORITY, "u=0, i")
-		headers.Insert(header.SEC_FETCH_DEST, "document")
-		headers.Insert(header.SEC_FETCH_MODE, "navigate")
-		headers.Insert(header.SEC_FETCH_SITE, "none")
-		headers.Insert(header.SEC_FETCH_USER, "?1")
-		headers.Insert(header.UPGRADE_INSECURE_REQUESTS, "1")
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // insertMobileHeaders is a placeholder mobile variant. On the day the real Chrome Android header
 // inserts diverge from desktop, this function is the single point to substitute them.
 func insertMobileHeaders[T ~string](headers *g.MapOrd[T, T], method string) {
-	switch method {
-	case http.MethodPost:
-		headers.Insert(header.ACCEPT, "*/*")
-		headers.Insert(header.CACHE_CONTROL, "no-cache")
-		headers.Insert(header.CONTENT_TYPE, "")
-		headers.Insert(header.CONTENT_LENGTH, "")
-		headers.Insert(header.PRAGMA, "no-cache")
-		headers.Insert(header.PRIORITY, "u=1, i")
-		headers.Insert(header.SEC_FETCH_DEST, "empty")
-		headers.Insert(header.SEC_FETCH_MODE, "cors")
-		headers.Insert(header.SEC_FETCH_SITE, "same-origin")
-	default:
-		headers.Insert(
-			header.ACCEPT,
-			"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-		)
-		headers.Insert(header.PRIORITY, "u=0, i")
-		headers.Insert(header.SEC_FETCH_DEST, "document")
-		headers.Insert(header.SEC_FETCH_MODE, "navigate")
-		headers.Insert(header.SEC_FETCH_SITE, "none")
-		headers.Insert(header.SEC_FETCH_USER, "?1")
-		headers.Insert(header.UPGRADE_INSECURE_REQUESTS, "1")
-	}
+	_ = "STUB: not implemented"
+	return
 }

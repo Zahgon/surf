@@ -1,7 +1,6 @@
 package sse
 
 import (
-	"bufio"
 	"io"
 
 	"github.com/enetx/g"
@@ -16,71 +15,19 @@ type Event struct {
 }
 
 // reset resets the event fields to their zero values or initial states.
-func (e *Event) reset() {
-	e.ID = ""
-	e.Event = ""
-	e.Data = ""
-	e.Retry = 0
-}
+func (e *Event) reset() { _ = "STUB: not implemented"; return }
 
 // parse parses the event data based on the event type.
-func (e *Event) parse(t, data g.String) {
-	data = data.Trim()
-
-	switch t.Trim() {
-	case "event":
-		e.Event = data
-	case "id":
-		e.ID = data
-	case "retry":
-		e.Retry = data.TryInt().UnwrapOr(-1)
-	case "data":
-		if e.Data.IsEmpty() {
-			e.Data = data
-		} else {
-			e.Data = e.Data + "\n" + data
-		}
-	}
-}
+func (e *Event) parse(t, data g.String) { _ = "STUB: not implemented"; return }
 
 // Skip checks if the event should be skipped.
-func (e *Event) Skip() bool {
-	if e.Data.IsEmpty() {
-		return true
-	}
-
-	return g.SliceOf[g.String]("", "null", "undefined").
-		Iter().
-		Any(func(s g.String) bool { return e.Data.Eq(s) })
-}
+func (e *Event) Skip() bool { _ = "STUB: not implemented"; return false }
 
 // Done checks if the event processing is done.
-func (e *Event) Done() bool { return e.Data.Eq("[DONE]") }
+func (e *Event) Done() bool { _ = "STUB: not implemented"; return false }
 
 // Read reads Server-Sent Events (SSE) from the provided reader and calls the provided function for each event.
 func Read(reader io.Reader, fn func(event *Event) bool) error {
-	var event Event
-
-	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() {
-		line := g.String(scanner.Text())
-
-		delimiter := line.Index(":")
-		if delimiter == -1 {
-			if event != (Event{}) {
-				if !fn(&event) {
-					return nil
-				}
-
-				event.reset()
-			}
-
-			continue
-		}
-
-		t, data := line[:delimiter], line[delimiter+1:]
-		event.parse(t, data)
-	}
-
-	return scanner.Err()
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -9,11 +9,7 @@
 package retryafter
 
 import (
-	"strconv"
-	"strings"
 	"time"
-
-	"github.com/enetx/http"
 )
 
 // Parse interprets value as a Retry-After header field.
@@ -32,27 +28,6 @@ import (
 // Multiple Retry-After headers are undefined by the RFC; callers must select
 // a single value via http.Header.Get before calling Parse.
 func Parse(value string, now time.Time) (time.Duration, bool) {
-	v := strings.TrimSpace(value)
-	if v == "" {
-		return 0, false
-	}
-
-	if n, err := strconv.Atoi(v); err == nil {
-		if n < 0 {
-			return 0, false
-		}
-
-		return time.Duration(n) * time.Second, true
-	}
-
-	if t, err := http.ParseTime(v); err == nil {
-		d := t.Sub(now)
-		if d < 0 {
-			return 0, true
-		}
-
-		return d, true
-	}
-
-	return 0, false
+	_ = "STUB: not implemented"
+	return *new(time.Duration), false
 }

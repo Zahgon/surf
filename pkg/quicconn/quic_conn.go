@@ -20,9 +20,7 @@
 package quicconn
 
 import (
-	"encoding/binary"
 	"errors"
-	"io"
 	"net"
 	"sync"
 	"time"
@@ -87,305 +85,101 @@ var _ net.PacketConn = (*QuicPacketConn)(nil)
 // The returned value implements net.PacketConn and can be passed to QUIC dialers
 // (e.g., quic-go's quic.Dial).
 func New(conn net.Conn, defaultTarget *net.UDPAddr, mode EncapMode) *QuicPacketConn {
-	if defaultTarget == nil && mode == EncapRaw {
-		panic("quicconn: defaultTarget is required for QUIC/UDP in EncapRaw mode")
-	}
-
-	return &QuicPacketConn{
-		conn:          conn,
-		mode:          mode,
-		defaultTarget: defaultTarget,
-		readBuf:       make([]byte, 64*1024),
-		writeBuf:      make([]byte, 0, 1500),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetReadBuffer optionally sets the receive buffer size if the underlying
 // connection exposes such an option (e.g., *net.UDPConn or any type with
 // SetReadBuffer(int) error). If unsupported, this method is a no-op and
 // returns nil. quic-go probes for this method via type assertion.
-func (q *QuicPacketConn) SetReadBuffer(n int) error {
-	if u, ok := q.conn.(*net.UDPConn); ok {
-		return u.SetReadBuffer(n)
-	}
-
-	type rb interface{ SetReadBuffer(int) error }
-	if u, ok := q.conn.(rb); ok {
-		return u.SetReadBuffer(n)
-	}
-
-	return nil
-}
+func (q *QuicPacketConn) SetReadBuffer(n int) error { _ = "STUB: not implemented"; return nil }
 
 // SetWriteBuffer optionally sets the send buffer size if the underlying
 // connection exposes such an option (e.g., *net.UDPConn or any type with
 // SetWriteBuffer(int) error). If unsupported, this method is a no-op and
 // returns nil. quic-go probes for this method via type assertion.
-func (q *QuicPacketConn) SetWriteBuffer(n int) error {
-	if u, ok := q.conn.(*net.UDPConn); ok {
-		return u.SetWriteBuffer(n)
-	}
-
-	type wb interface{ SetWriteBuffer(int) error }
-	if u, ok := q.conn.(wb); ok {
-		return u.SetWriteBuffer(n)
-	}
-
-	return nil
-}
+func (q *QuicPacketConn) SetWriteBuffer(n int) error { _ = "STUB: not implemented"; return nil }
 
 // ReadFrom reads a single datagram into p and returns the number of bytes,
 // the source address, and any error encountered. In EncapSocks5 mode, it
 // removes the RFC 1928 header and returns the payload with decoded source
 // address. If no header is present, the packet is treated as raw.
 func (q *QuicPacketConn) ReadFrom(p []byte) (int, net.Addr, error) {
-	q.rmu.Lock()
-	defer q.rmu.Unlock()
-
-	// Calculate required readBuf size
-	need := len(p)
-	if q.mode == EncapSocks5 {
-		// Reserve space for RFC1928 header: RSV/FRAG(3) + ATYP(1) + addr(<=16) + port(2)
-		// Maximum: 3 + 1 + 16 + 2 = 22, using 32 for safety margin
-		need += 32
-	}
-
-	if need > len(q.readBuf) {
-		// Growth strategy: double current size or exact need, whichever is larger
-		newSize := max(need, 2*len(q.readBuf))
-		q.readBuf = make([]byte, newSize)
-	}
-
-	n, err := q.conn.Read(q.readBuf)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	switch q.mode {
-	case EncapSocks5:
-		payload, src, ok, perr := parseSocks5UDP(q.readBuf[:n])
-		if perr != nil {
-			return 0, nil, perr
-		}
-
-		if !ok {
-			if len(q.readBuf[:n]) > len(p) {
-				return 0, nil, errors.New("buffer too small")
-			}
-
-			if q.defaultTarget == nil {
-				return 0, nil, ErrDefaultTargetRequired
-			}
-
-			copy(p, q.readBuf[:n])
-
-			return n, q.defaultTarget, nil
-		}
-
-		if len(payload) > len(p) {
-			return 0, nil, errors.New("buffer too small for SOCKS5 UDP payload")
-		}
-
-		copy(p, payload)
-
-		return len(payload), src, nil
-	default: // EncapRaw
-		if len(q.readBuf[:n]) > len(p) {
-			return 0, nil, errors.New("buffer too small")
-		}
-
-		if q.defaultTarget == nil {
-			return 0, nil, ErrDefaultTargetRequired
-		}
-
-		copy(p, q.readBuf[:n])
-
-		return n, q.defaultTarget, nil
-	}
+	_ = "STUB: not implemented"
+	return 0, *new(net.Addr), nil
 }
+
+// Calculate required readBuf size
+
+// Reserve space for RFC1928 header: RSV/FRAG(3) + ATYP(1) + addr(<=16) + port(2)
+// Maximum: 3 + 1 + 16 + 2 = 22, using 32 for safety margin
+
+// Growth strategy: double current size or exact need, whichever is larger
+
+// EncapRaw
 
 // WriteTo writes datagram p to addr. If addr is nil, defaultTarget is used.
 // In EncapSocks5 mode, the datagram is wrapped in an RFC 1928 UDP header.
 // In EncapRaw mode, p is forwarded as-is.
 func (q *QuicPacketConn) WriteTo(p []byte, addr net.Addr) (int, error) {
-	q.wmu.Lock()
-	defer q.wmu.Unlock()
-
-	dst := q.defaultTarget
-	if addr != nil {
-		ua, ok := addr.(*net.UDPAddr)
-		if !ok {
-			return 0, errors.New("WriteTo expects *net.UDPAddr")
-		}
-
-		dst = ua
-	}
-
-	if dst == nil {
-		return 0, ErrDefaultTargetRequired
-	}
-
-	if q.mode == EncapSocks5 {
-		hdr, err := buildSocks5UDP(dst)
-		if err != nil {
-			return 0, err
-		}
-
-		// Calculate required buffer size for header + payload
-		need := len(hdr) + len(p)
-		if need > cap(q.writeBuf) {
-			// Growth strategy: double current capacity or exact need, whichever is larger
-			newCap := max(need, 2*cap(q.writeBuf))
-			q.writeBuf = make([]byte, 0, newCap)
-		}
-
-		// Reuse internal buffer to avoid allocs.
-		q.writeBuf = append(q.writeBuf[:0], hdr...)
-		q.writeBuf = append(q.writeBuf, p...)
-
-		n, err := q.conn.Write(q.writeBuf)
-		if err != nil {
-			return 0, err
-		}
-
-		if n < len(q.writeBuf) {
-			return 0, io.ErrShortWrite
-		}
-
-		return len(p), nil
-	}
-
-	// EncapRaw
-	n, err := q.conn.Write(p)
-	if err != nil {
-		return 0, err
-	}
-
-	if n < len(p) {
-		return 0, io.ErrShortWrite
-	}
-
-	return len(p), nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
+
+// Calculate required buffer size for header + payload
+
+// Growth strategy: double current capacity or exact need, whichever is larger
+
+// Reuse internal buffer to avoid allocs.
+
+// EncapRaw
 
 // Close closes the underlying connection.
-func (q *QuicPacketConn) Close() error {
-	return q.conn.Close()
-}
+func (q *QuicPacketConn) Close() error { _ = "STUB: not implemented"; return nil }
 
 // LocalAddr reports the local network address. It delegates to the underlying
 // connection.
 func (q *QuicPacketConn) LocalAddr() net.Addr {
-	return q.conn.LocalAddr()
+	_ = "STUB: not implemented"
+	return *
+
+	// SetDeadline sets both read and write deadlines on the underlying connection.
+	new(net.Addr)
 }
 
-// SetDeadline sets both read and write deadlines on the underlying connection.
-func (q *QuicPacketConn) SetDeadline(t time.Time) error {
-	return q.conn.SetDeadline(t)
-}
+func (q *QuicPacketConn) SetDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // SetReadDeadline sets the read deadline on the underlying connection.
-func (q *QuicPacketConn) SetReadDeadline(t time.Time) error {
-	return q.conn.SetReadDeadline(t)
-}
+func (q *QuicPacketConn) SetReadDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // SetWriteDeadline sets the write deadline on the underlying connection.
-func (q *QuicPacketConn) SetWriteDeadline(t time.Time) error {
-	return q.conn.SetWriteDeadline(t)
-}
+func (q *QuicPacketConn) SetWriteDeadline(t time.Time) error { _ = "STUB: not implemented"; return nil }
 
 // buildSocks5UDP constructs an RFC 1928 UDP ASSOCIATE header for the given
 // destination address. Only literal IP destinations are supported; domain
 // names must be resolved by the caller.
-func buildSocks5UDP(dst *net.UDPAddr) ([]byte, error) {
-	if dst == nil {
-		return nil, errors.New("nil destination")
-	}
+func buildSocks5UDP(dst *net.UDPAddr) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	h := make([]byte, 0, 4+16+2)
-	h = append(h, 0x00, 0x00, 0x00) // RSV(2) + FRAG(1)
+// RSV(2) + FRAG(1)
 
-	if ip4 := dst.IP.To4(); ip4 != nil {
-		h = append(h, 0x01) // ATYP = IPv4
-		h = append(h, ip4...)
-	} else if ip6 := dst.IP.To16(); ip6 != nil {
-		h = append(h, 0x04) // ATYP = IPv6
-		h = append(h, ip6...)
-	} else {
-		return nil, errors.New("destination IP not set")
-	}
+// ATYP = IPv4
 
-	port := make([]byte, 2)
-	binary.BigEndian.PutUint16(port, uint16(dst.Port))
-	h = append(h, port...)
-
-	return h, nil
-}
+// ATYP = IPv6
 
 // parseSocks5UDP parses an RFC 1928 UDP ASSOCIATE datagram.
 // It returns the payload, the decoded source address (for IPv4/IPv6 ATYP),
 // a boolean indicating whether a SOCKS5 header was present, and an error.
 // Domain-name ATYP on receive is not supported and results in (true, error).
 func parseSocks5UDP(pkt []byte) ([]byte, net.Addr, bool, error) {
-	if len(pkt) < 4 {
-		return nil, nil, false, nil
-	}
-
-	if pkt[0] != 0x00 || pkt[1] != 0x00 {
-		return nil, nil, false, nil
-	}
-
-	// FRAG must be 0x00 (fragmentation not supported).
-	if pkt[2] != 0x00 {
-		return nil, nil, true, errors.New("SOCKS5 UDP fragmentation not supported (FRAG != 0)")
-	}
-
-	atyp := pkt[3]
-	off := 4
-
-	var ip net.IP
-
-	switch atyp {
-	case 0x01: // IPv4
-		if len(pkt) < off+4+2 {
-			return nil, nil, true, errors.New("short IPv4 SOCKS5 UDP packet")
-		}
-
-		ip = net.IP(pkt[off : off+4])
-		off += 4
-	case 0x04: // IPv6
-		if len(pkt) < off+16+2 {
-			return nil, nil, true, errors.New("short IPv6 SOCKS5 UDP packet")
-		}
-
-		ip = net.IP(pkt[off : off+16])
-		off += 16
-	case 0x03: // DOMAIN
-		if len(pkt) < off+1 {
-			return nil, nil, true, errors.New("short domain length")
-		}
-
-		dlen := int(pkt[off])
-		off++
-		if len(pkt) < off+dlen+2 {
-			return nil, nil, true, errors.New("short domain SOCKS5 UDP packet")
-		}
-
-		return nil, nil, true, errors.New("DOMAIN ATYP not supported on receive")
-	default:
-		return nil, nil, true, errors.New("unknown ATYP")
-	}
-
-	if len(pkt) < off+2 {
-		return nil, nil, true, errors.New("short port")
-	}
-
-	port := int(binary.BigEndian.Uint16(pkt[off : off+2]))
-	off += 2
-
-	if len(pkt) < off {
-		return nil, nil, true, errors.New("bad payload offset")
-	}
-
-	return pkt[off:], &net.UDPAddr{IP: ip, Port: port}, true, nil
+	_ = "STUB: not implemented"
+	return nil, *new(net.Addr), false, nil
 }
+
+// FRAG must be 0x00 (fragmentation not supported).
+
+// IPv4
+
+// IPv6
+
+// DOMAIN

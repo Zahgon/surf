@@ -27,16 +27,10 @@ const (
 )
 
 // IsMobile reports whether the OS is a mobile form factor (Android or iOS).
-func (k OSKey) IsMobile() bool { return k == Android || k == IOS }
+func (k OSKey) IsMobile() bool { _ = "STUB: not implemented"; return false }
 
 // Mobile returns the value of the sec-ch-ua-mobile header: "?1" for mobile OS, "?0" otherwise.
-func (k OSKey) Mobile() g.String {
-	if k.IsMobile() {
-		return "?1"
-	}
-
-	return "?0"
-}
+func (k OSKey) Mobile() g.String { _ = "STUB: not implemented"; return *new(g.String) }
 
 // H2Config is the fluent contract used by profile.ConfigureH2 callbacks. It mirrors the
 // methods on surf.HTTP2Settings, the surf package provides an adapter that satisfies it.

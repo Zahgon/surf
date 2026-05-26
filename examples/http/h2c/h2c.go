@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/enetx/http"
 	"github.com/enetx/http2"
-	"github.com/enetx/http2/h2c"
 	"github.com/enetx/surf"
 )
 
@@ -24,17 +22,4 @@ func main() {
 	r.Ok().Debug().Request(true).Response(true).Print()
 }
 
-func H2CServerUpgrade() {
-	h2s := &http2.Server{}
-
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello %s http == %v", r.Proto, r.TLS == nil)
-	})
-
-	server := &http.Server{
-		Addr:    "0.0.0.0:1010",
-		Handler: h2c.NewHandler(handler, h2s),
-	}
-
-	server.ListenAndServe()
-}
+func H2CServerUpgrade() { _ = "STUB: not implemented"; return }

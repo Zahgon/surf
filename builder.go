@@ -3,7 +3,6 @@ package surf
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"time"
 
 	"github.com/enetx/g"
@@ -38,13 +37,7 @@ type Builder struct {
 
 // Build applies all configured settings and returns the client.
 // Returns g.Result with error if any middleware fails.
-func (b *Builder) Build() g.Result[*Client] {
-	if err := b.cliMWs.run(b.cli); err != nil {
-		return g.Err[*Client](err)
-	}
-
-	return g.Ok(b.cli)
-}
+func (b *Builder) Build() g.Result[*Client] { _ = "STUB: not implemented"; return nil }
 
 // With registers middleware into the client builder with optional priority.
 //
@@ -82,203 +75,130 @@ func (b *Builder) Build() g.Result[*Client] {
 //
 // Note: Ensure that middleware functions adhere to the specified function signatures to work correctly with the With method.
 func (b *Builder) With(middleware any, priority ...int) *Builder {
-	p := g.Int(g.Slice[int](priority).Get(0).UnwrapOrDefault())
-
-	switch v := middleware.(type) {
-	case func(*Client) error:
-		b.addCliMW(v, p)
-	case func(*Request) error:
-		b.addReqMW(v, p)
-	case func(*Response) error:
-		b.addRespMW(v, p)
-	default:
-		panic(fmt.Sprintf("invalid middleware type: %T", v))
-	}
-
-	return b
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // addCliMW adds a client middleware to the ClientBuilder.
 func (b *Builder) addCliMW(m func(*Client) error, priority g.Int) *Builder {
-	b.cliMWs.add(priority, m)
-	return b
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // addReqMW adds a request middleware to the ClientBuilder.
 func (b *Builder) addReqMW(m func(*Request) error, priority g.Int) *Builder {
-	b.cli.reqMWs.add(priority, m)
-	return b
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // addRespMW adds a response middleware to the ClientBuilder.
 func (b *Builder) addRespMW(m func(*Response) error, priority g.Int) *Builder {
-	b.cli.respMWs.add(priority, m)
-	return b
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (b *Builder) Boundary(boundary func() g.String) *Builder {
-	return b.addCliMW(func(client *Client) error { return boundaryMW(client, boundary) }, 999)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SecureTLS enables TLS certificate verification.
 // By default surf skips certificate verification (InsecureSkipVerify=true).
 // Call this for production use where certificate validation is required.
-func (b *Builder) SecureTLS() *Builder {
-	b.cli.tlsConfig.InsecureSkipVerify = false
-	return b
-}
+func (b *Builder) SecureTLS() *Builder { _ = "STUB: not implemented"; return nil }
 
 // WebSocketGuard enables middleware that blocks WebSocket upgrade responses (HTTP 101).
 // Without this, surf allows 101 Switching Protocols to pass through — compatible with
 // websocket.Dial and other WebSocket libraries that use surf.Std() as HTTPClient.
 // Enable this only if you want to explicitly reject unexpected WebSocket upgrades.
-func (b *Builder) WebSocketGuard() *Builder {
-	b.addReqMW(got101ResponseMW, 0)
-	b.addRespMW(webSocketUpgradeErrorMW, 0)
-
-	return b
-}
+func (b *Builder) WebSocketGuard() *Builder { _ = "STUB: not implemented"; return nil }
 
 // H2C configures the client to handle HTTP/2 Cleartext (h2c).
-func (b *Builder) H2C() *Builder { return b.addCliMW(h2cMW, 999) }
+func (b *Builder) H2C() *Builder { _ = "STUB: not implemented"; return nil }
 
 // HTTP2Settings configures settings related to HTTP/2 and returns an http2s struct.
-func (b *Builder) HTTP2Settings() *HTTP2Settings {
-	h2 := &HTTP2Settings{builder: b}
-	b.http2settings = h2
-
-	return h2
-}
+func (b *Builder) HTTP2Settings() *HTTP2Settings { _ = "STUB: not implemented"; return nil }
 
 // HTTP3Settings configures settings related to HTTP/3 and returns an http3s struct.
-func (b *Builder) HTTP3Settings() *HTTP3Settings {
-	h3 := &HTTP3Settings{builder: b}
-	b.http3settings = h3
-
-	return h3
-}
+func (b *Builder) HTTP3Settings() *HTTP3Settings { _ = "STUB: not implemented"; return nil }
 
 // ForceHTTP3 configures the client to use HTTP/3 forcefully.
-func (b *Builder) ForceHTTP3() *Builder {
-	b.forceHTTP3 = true
-	return b
-}
+func (b *Builder) ForceHTTP3() *Builder { _ = "STUB: not implemented"; return nil }
 
 // Impersonate configures something related to impersonation and returns an impersonate struct.
-func (b *Builder) Impersonate() *Impersonate { return &Impersonate{builder: b} }
+func (b *Builder) Impersonate() *Impersonate { _ = "STUB: not implemented"; return nil }
 
 // JA configures the client to use a specific TLS fingerprint.
-func (b *Builder) JA() *JA {
-	b.ja = true
-	return &JA{builder: b}
-}
+func (b *Builder) JA() *JA { _ = "STUB: not implemented"; return nil }
 
 // UnixSocket sets the path for a Unix domain socket.
 // This allows the HTTP client to connect to the server using a Unix domain
 // socket instead of a traditional TCP/IP connection.
-func (b *Builder) UnixSocket(address g.String) *Builder {
-	return b.addCliMW(func(client *Client) error { return unixSocketMW(client, address) }, 0)
-}
+func (b *Builder) UnixSocket(address g.String) *Builder { _ = "STUB: not implemented"; return nil }
 
 // DNS sets the custom DNS resolver address.
-func (b *Builder) DNS(dns g.String) *Builder {
-	return b.addCliMW(func(client *Client) error { return dnsMW(client, dns) }, 0)
-}
+func (b *Builder) DNS(dns g.String) *Builder { _ = "STUB: not implemented"; return nil }
 
 // DNSOverTLS configures the client to use DNS over TLS.
-func (b *Builder) DNSOverTLS() *DNSOverTLS { return &DNSOverTLS{builder: b} }
+func (b *Builder) DNSOverTLS() *DNSOverTLS { _ = "STUB: not implemented"; return nil }
 
 // Timeout sets the timeout duration for the client.
-func (b *Builder) Timeout(timeout time.Duration) *Builder {
-	return b.addCliMW(func(client *Client) error { return timeoutMW(client, timeout) }, 0)
-}
+func (b *Builder) Timeout(timeout time.Duration) *Builder { _ = "STUB: not implemented"; return nil }
 
 // TLSConfig sets a custom TLS configuration for the client.
-func (b *Builder) TLSConfig(config *tls.Config) *Builder {
-	return b.addCliMW(func(client *Client) error { return tlsConfigMW(client, config) }, 0)
-}
+func (b *Builder) TLSConfig(config *tls.Config) *Builder { _ = "STUB: not implemented"; return nil }
 
 // InterfaceAddr sets the local network interface for outbound connections.
 // Accepts either an IP address (e.g., "192.168.1.100", "::1") or an interface name (e.g., "eth0", "en0").
-func (b *Builder) InterfaceAddr(address g.String) *Builder {
-	return b.addCliMW(func(client *Client) error { return interfaceAddrMW(client, address) }, 0)
-}
+func (b *Builder) InterfaceAddr(address g.String) *Builder { _ = "STUB: not implemented"; return nil }
 
 // Proxy sets the proxy URL for the client.
-func (b *Builder) Proxy(proxy g.String) *Builder {
-	b.proxy = proxy
-	return b.addCliMW(func(client *Client) error { return proxyMW(client, proxy) }, 0)
-}
+func (b *Builder) Proxy(proxy g.String) *Builder { _ = "STUB: not implemented"; return nil }
 
 // BasicAuth sets the basic authentication credentials for the client.
 func (b *Builder) BasicAuth(authentication g.String) *Builder {
-	return b.addReqMW(func(req *Request) error { return basicAuthMW(req, authentication) }, 900)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // BearerAuth sets the bearer token for the client.
 func (b *Builder) BearerAuth(authentication g.String) *Builder {
-	return b.addReqMW(func(req *Request) error { return bearerAuthMW(req, authentication) }, 901)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // UserAgent sets the user agent for the client.
-func (b *Builder) UserAgent(userAgent any) *Builder {
-	return b.addReqMW(func(req *Request) error { return userAgentMW(req, userAgent) }, 0)
-}
+func (b *Builder) UserAgent(userAgent any) *Builder { _ = "STUB: not implemented"; return nil }
 
 // SetHeaders sets headers for the request, replacing existing ones with the same name.
-func (b *Builder) SetHeaders(headers ...any) *Builder {
-	return b.addReqMW(func(r *Request) error {
-		r.SetHeaders(headers...)
-		return nil
-	}, 0)
-}
+func (b *Builder) SetHeaders(headers ...any) *Builder { _ = "STUB: not implemented"; return nil }
 
 // AddHeaders adds headers to the request, appending to any existing headers with the same name.
-func (b *Builder) AddHeaders(headers ...any) *Builder {
-	return b.addReqMW(func(r *Request) error {
-		r.AddHeaders(headers...)
-		return nil
-	}, 0)
-}
+func (b *Builder) AddHeaders(headers ...any) *Builder { _ = "STUB: not implemented"; return nil }
 
 // AddCookies adds cookies to the request.
 func (b *Builder) AddCookies(cookies ...*http.Cookie) *Builder {
-	return b.addReqMW(func(r *Request) error {
-		r.AddCookies(cookies...)
-		return nil
-	}, 0)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // WithContext associates the provided context with the request.
-func (b *Builder) WithContext(ctx context.Context) *Builder {
-	return b.addReqMW(func(r *Request) error {
-		r.WithContext(ctx)
-		return nil
-	}, 0)
-}
+func (b *Builder) WithContext(ctx context.Context) *Builder { _ = "STUB: not implemented"; return nil }
 
 // ContentType sets the content type for the client.
-func (b *Builder) ContentType(contentType g.String) *Builder {
-	return b.addReqMW(func(req *Request) error { return contentTypeMW(req, contentType) }, 0)
-}
+func (b *Builder) ContentType(contentType g.String) *Builder { _ = "STUB: not implemented"; return nil }
 
 // CacheBody configures whether the client should cache the body of the response.
-func (b *Builder) CacheBody() *Builder {
-	b.cacheBody = true
-	return b
-}
+func (b *Builder) CacheBody() *Builder { _ = "STUB: not implemented"; return nil }
 
 // GetRemoteAddress configures whether the client should get the remote address.
-func (b *Builder) GetRemoteAddress() *Builder { return b.addReqMW(remoteAddrMW, 0) }
+func (b *Builder) GetRemoteAddress() *Builder { _ = "STUB: not implemented"; return nil }
 
 // DisableKeepAlive disable keep-alive connections.
-func (b *Builder) DisableKeepAlive() *Builder { return b.addCliMW(disableKeepAliveMW, 0) }
+func (b *Builder) DisableKeepAlive() *Builder { _ = "STUB: not implemented"; return nil }
 
 // DisableCompression disables automatic response body decompression.
-func (b *Builder) DisableCompression() *Builder {
-	b.disableCompression = true
-	return b
-}
+func (b *Builder) DisableCompression() *Builder { _ = "STUB: not implemented"; return nil }
 
 // Retry configures the retry behavior of the client.
 //
@@ -303,67 +223,38 @@ func (b *Builder) DisableCompression() *Builder {
 // single cli.Do invocation (connect + transmission + body read); it does
 // not interrupt the sleep between retries.
 func (b *Builder) Retry(retryMax int, retryWait time.Duration, codes ...int) *Builder {
-	b.retryMax = retryMax
-	b.retryWait = retryWait
-
-	if len(codes) == 0 {
-		b.retryCodes = g.SliceOf(
-			http.StatusInternalServerError,
-			http.StatusTooManyRequests,
-			http.StatusServiceUnavailable,
-		)
-	} else {
-		b.retryCodes = g.SliceOf(codes...)
-	}
-
-	return b
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ForceHTTP1 configures the client to use HTTP/1.1 forcefully.
-func (b *Builder) ForceHTTP1() *Builder {
-	b.forceHTTP1 = true
-	return b.addCliMW(forceHTTP1MW, 0)
-}
+func (b *Builder) ForceHTTP1() *Builder { _ = "STUB: not implemented"; return nil }
 
 // ForceHTTP2 configures the client to use HTTP/2 forcefully.
-func (b *Builder) ForceHTTP2() *Builder {
-	b.forceHTTP2 = true
-	return b.addCliMW(forceHTTP2MW, 0)
-}
+func (b *Builder) ForceHTTP2() *Builder { _ = "STUB: not implemented"; return nil }
 
 // Session configures whether the client should maintain a session.
-func (b *Builder) Session() *Builder { return b.addCliMW(sessionMW, 0) }
+func (b *Builder) Session() *Builder { _ = "STUB: not implemented"; return nil }
 
 // MaxRedirects sets the maximum number of redirects the client should follow.
-func (b *Builder) MaxRedirects(maxRedirects int) *Builder {
-	b.maxRedirects = maxRedirects
-	return b.addCliMW(redirectPolicyMW, 0)
-}
+func (b *Builder) MaxRedirects(maxRedirects int) *Builder { _ = "STUB: not implemented"; return nil }
 
 // NotFollowRedirects disables following redirects for the client.
-func (b *Builder) NotFollowRedirects() *Builder {
-	return b.RedirectPolicy(func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse })
-}
+func (b *Builder) NotFollowRedirects() *Builder { _ = "STUB: not implemented"; return nil }
 
 // FollowOnlyHostRedirects configures whether the client should only follow redirects within the
 // same host.
-func (b *Builder) FollowOnlyHostRedirects() *Builder {
-	b.followOnlyHostRedirects = true
-	return b.addCliMW(redirectPolicyMW, 0)
-}
+func (b *Builder) FollowOnlyHostRedirects() *Builder { _ = "STUB: not implemented"; return nil }
 
 // ForwardHeadersOnRedirect adds a middleware to the ClientBuilder object that ensures HTTP headers are
 // forwarded during a redirect.
-func (b *Builder) ForwardHeadersOnRedirect() *Builder {
-	b.forwardHeadersOnRedirect = true
-	return b.addCliMW(redirectPolicyMW, 0)
-}
+func (b *Builder) ForwardHeadersOnRedirect() *Builder { _ = "STUB: not implemented"; return nil }
 
 // RedirectPolicy sets a custom redirect policy for the client.
 func (b *Builder) RedirectPolicy(fn func(*http.Request, []*http.Request) error) *Builder {
-	b.checkRedirect = fn
-	return b.addCliMW(redirectPolicyMW, 0)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // String generate a string representation of the ClientBuilder instance.
-func (b Builder) String() string { return fmt.Sprintf("%#v", b) }
+func (b Builder) String() string { _ = "STUB: not implemented"; return "" }

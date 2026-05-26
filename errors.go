@@ -1,7 +1,5 @@
 package surf
 
-import "fmt"
-
 // Custom error types for surf HTTP client operations.
 // These errors provide specific information about different failure scenarios
 // that can occur during HTTP requests and responses.
@@ -32,20 +30,12 @@ type (
 	}
 )
 
-func (e *ErrWebSocketUpgrade) Error() string {
-	return fmt.Sprintf("%s received an unexpected response, switching protocols to WebSocket", e.Msg)
-}
+func (e *ErrWebSocketUpgrade) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *ErrUserAgentType) Error() string {
-	return fmt.Sprintf("unsupported user agent type: %s", e.Msg)
-}
+func (e *ErrUserAgentType) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *Err101ResponseCode) Error() string {
-	return fmt.Sprintf("%s received a 101 response status code", e.Msg)
-}
+func (e *Err101ResponseCode) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *ErrHTTP2Fallback) Error() string {
-	return fmt.Sprintf("surf: HTTP/2 request failed: %v; HTTP/1.1 fallback failed: %v", e.HTTP2, e.HTTP1)
-}
+func (e *ErrHTTP2Fallback) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *ErrHTTP2Fallback) Unwrap() []error { return []error{e.HTTP2, e.HTTP1} }
+func (e *ErrHTTP2Fallback) Unwrap() []error { _ = "STUB: not implemented"; return nil }

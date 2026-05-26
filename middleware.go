@@ -2,7 +2,6 @@ package surf
 
 import (
 	"github.com/enetx/g"
-	"github.com/enetx/g/cmp"
 )
 
 // mw represents a middleware wrapper that holds the function itself,
@@ -26,14 +25,7 @@ type middleware[T any] struct {
 //   - *middleware[T]: a pointer to a new middleware instance
 //
 // Lower priority values execute earlier. For equal priorities, insertion order is preserved.
-func newMiddleware[T any]() *middleware[T] {
-	return &middleware[T]{
-		heap: g.NewHeap(func(a, b mw[T]) cmp.Ordering {
-			return a.priority.Cmp(b.priority).
-				Then(a.order.Cmp(b.order))
-		}),
-	}
-}
+func newMiddleware[T any]() *middleware[T] { _ = "STUB: not implemented"; return nil }
 
 // add adds a middleware function to the chain with the specified priority.
 //
@@ -42,10 +34,7 @@ func newMiddleware[T any]() *middleware[T] {
 //   - fn func(T) error: the middleware function that receives a context of type T
 //
 // Functions with the same priority are executed in the order they were added.
-func (m *middleware[T]) add(priority g.Int, fn func(T) error) {
-	m.heap.Push(mw[T]{fn, priority, m.counter})
-	m.counter++
-}
+func (m *middleware[T]) add(priority g.Int, fn func(T) error) { _ = "STUB: not implemented"; return }
 
 // run executes all middleware functions in priority order.
 //
@@ -58,15 +47,4 @@ func (m *middleware[T]) add(priority g.Int, fn func(T) error) {
 // Note:
 //   - A clone of the heap is used during execution to avoid mutating the original chain.
 //   - Execution stops immediately if any middleware returns a non-nil error.
-func (m *middleware[T]) run(ctx T) error {
-	clone := m.heap.Clone()
-
-	for !clone.IsEmpty() {
-		item := clone.Pop().Some()
-		if err := item.fn(ctx); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
+func (m *middleware[T]) run(ctx T) error { _ = "STUB: not implemented"; return nil }

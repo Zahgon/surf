@@ -6,10 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"path/filepath"
-	"sort"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -126,39 +123,11 @@ func main() {
 	os.WriteFile(path.Base(pURL.Path), out.Bytes(), 0o644)
 }
 
-func sortFiles(files []string) {
-	sort.Slice(files, func(i, j int) bool {
-		a := strings.Split(filepath.Base(files[i]), ".")[0]
-		ai, _ := strconv.Atoi(a)
-
-		b := strings.Split(filepath.Base(files[j]), ".")[0]
-		bi, _ := strconv.Atoi(b)
-		return ai < bi
-	})
-}
+func sortFiles(files []string) { _ = "STUB: not implemented"; return }
 
 func mergeFiles(files []string) (bytes.Buffer, error) {
-	defer removeFiles(files)
-
-	var out bytes.Buffer
-
-	for _, file := range files {
-		content, err := os.ReadFile(file)
-		if err != nil {
-			return out, err
-		}
-
-		_, err = out.Write(content)
-		if err != nil {
-			return out, err
-		}
-	}
-
-	return out, nil
+	_ = "STUB: not implemented"
+	return *new(bytes.Buffer), nil
 }
 
-func removeFiles(files []string) {
-	for _, file := range files {
-		os.Remove(file)
-	}
-}
+func removeFiles(files []string) { _ = "STUB: not implemented"; return }

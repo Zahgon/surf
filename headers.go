@@ -1,9 +1,6 @@
 package surf
 
 import (
-	"net/textproto"
-	"regexp"
-
 	"github.com/enetx/g"
 	"github.com/enetx/http"
 )
@@ -16,54 +13,21 @@ type Headers http.Header
 // indicating whether any of the patterns are found in the header values.
 // The patterns can be a string, a slice of strings, or a slice of *regexp.Regexp.
 func (h Headers) Contains(header g.String, patterns any) bool {
-	if h.Values(header) != nil {
-		for _, value := range h.Values(header) {
-			v := value.Lower()
-			switch ps := patterns.(type) {
-			case string:
-				if v.Contains(g.String(ps).Lower()) {
-					return true
-				}
-			case g.String:
-				if v.Contains(ps.Lower()) {
-					return true
-				}
-			case []string:
-				if v.ContainsAny(g.TransformSlice(ps, g.NewString).Iter().Map(g.String.Lower).Collect()...) {
-					return true
-				}
-			case g.Slice[string]:
-				if v.ContainsAny(g.TransformSlice(ps, g.NewString).Iter().Map(g.String.Lower).Collect()...) {
-					return true
-				}
-			case g.Slice[g.String]:
-				if v.ContainsAny(ps.Iter().Map(g.String.Lower).Collect()...) {
-					return true
-				}
-			case []*regexp.Regexp:
-				if v.Regexp().MatchAny(ps...) {
-					return true
-				}
-			}
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return false
 }
 
 // Values returns the values associated with a specified header key.
 // It wraps the Values method from the textproto.MIMEHeader type.
-func (h Headers) Values(key g.String) g.Slice[g.String] {
-	return g.TransformSlice(textproto.MIMEHeader(h).Values(key.Std()), g.NewString)
-}
+func (h Headers) Values(key g.String) g.Slice[g.String] { _ = "STUB: not implemented"; return nil }
 
 // Get returns the first value associated with a specified header key.
 // It wraps the Get method from the textproto.MIMEHeader type.
-func (h Headers) Get(key g.String) g.String { return g.String(textproto.MIMEHeader(h).Get(key.Std())) }
+func (h Headers) Get(key g.String) g.String { _ = "STUB: not implemented"; return *new(g.String) }
 
 // Del deletes the values associated with a specified header key.
 // It wraps the Del method from the textproto.MIMEHeader type.
-func (h Headers) Del(key g.String) { textproto.MIMEHeader(h).Del(key.Std()) }
+func (h Headers) Del(key g.String) { _ = "STUB: not implemented"; return }
 
 // Clone returns a copy of Headers or nil if Headers is nil.
-func (h Headers) Clone() Headers { return Headers(http.Header(h).Clone()) }
+func (h Headers) Clone() Headers { _ = "STUB: not implemented"; return *new(Headers) }

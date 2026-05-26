@@ -1,7 +1,5 @@
 package socks4
 
-import "fmt"
-
 type (
 	ErrWrongNetwork    struct{}
 	ErrConnRejected    struct{}
@@ -22,27 +20,24 @@ type (
 	}
 )
 
-func (e *ErrDialFailed) Error() string { return fmt.Sprintf("socks4 dial %v", e.err) }
-func (e *ErrDialFailed) Unwrap() error { return e.err }
+func (e *ErrDialFailed) Error() string { _ = "STUB: not implemented"; return "" }
+func (e *ErrDialFailed) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e *ErrHostUnknown) Error() string {
-	return fmt.Sprintf("unable to find IP address of host %s", e.msg)
-}
-func (e *ErrHostUnknown) Unwrap() error { return e.err }
+func (e *ErrHostUnknown) Error() string { _ = "STUB: not implemented"; return "" }
 
-func (e *ErrBuffer) Error() string { return "unable write into buffer" }
-func (e *ErrBuffer) Unwrap() error { return e.err }
+func (e *ErrHostUnknown) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e *ErrIO) Error() string { return "io error" }
-func (e *ErrIO) Unwrap() error { return e.err }
+func (e *ErrBuffer) Error() string { _ = "STUB: not implemented"; return "" }
+func (e *ErrBuffer) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e *ErrWrongAddr) Error() string { return fmt.Sprintf("wrong addr: %s, error: %v", e.msg, e.err) }
-func (e *ErrWrongAddr) Unwrap() error { return e.err }
+func (e *ErrIO) Error() string { _ = "STUB: not implemented"; return "" }
+func (e *ErrIO) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e *ErrWrongNetwork) Error() string { return "network should be tcp or tcp4" }
+func (e *ErrWrongAddr) Error() string { _ = "STUB: not implemented"; return "" }
+func (e *ErrWrongAddr) Unwrap() error { _ = "STUB: not implemented"; return nil }
 
-func (e *ErrConnRejected) Error() string  { return "connection to remote host was rejected" }
-func (e *ErrIdentRequired) Error() string { return "valid ident required" }
-func (e *ErrInvalidResponse) Error() string {
-	return fmt.Sprintf("unknown socks4 server response 0x%02x", e.resp)
-}
+func (e *ErrWrongNetwork) Error() string { _ = "STUB: not implemented"; return "" }
+
+func (e *ErrConnRejected) Error() string    { _ = "STUB: not implemented"; return "" }
+func (e *ErrIdentRequired) Error() string   { _ = "STUB: not implemented"; return "" }
+func (e *ErrInvalidResponse) Error() string { _ = "STUB: not implemented"; return "" }
